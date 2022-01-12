@@ -35,6 +35,8 @@ chmod 400 ./terraform/private_key.pem
 
 ### Running the Terraform Scripts
 
+Before running the Terraform scripts, you will need to create `terraform_aws.tfvars` and provide all the details required by the Terraform variables.
+
 The following commands will prepare and run the Terraform scripts:
 
 ```
@@ -67,7 +69,7 @@ You may now use `docker-compose up -d` to start up Nextcloud and all related ser
 
 Verify that it is running correctly using `docker ps` to verify that `ubuntu_proxy_1` is running and exposes TCP port 80 and 443. Additionally, running `curl -L http://localhost -v` should redirect to HTTPS and return an HTML document
 
-Finally, you can visit `http://nextcloud.elliottpope.com` to login
+Finally, you can visit `http://nextcloud.${DOMAIN}` to login
 
 ### Admin Setup
 
