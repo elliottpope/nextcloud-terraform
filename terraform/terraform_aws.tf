@@ -31,13 +31,21 @@ variable "nextcloud_data_root_dir" {
   type = string
 }
 
+variable "root_domain" {
+  type = string
+}
+
+variable "ssh_key_name" {
+  type = string
+}
+
 # Configure the AWS Provider
 provider "aws" {
   region = var.aws_region
 }
 
 provider "cloudflare" {
-  # Provide an API Token with DNS:Edit permissions on elliottpope.com in the anvironment as CLOUDFLARE_API_TOKEN
+  # Provide an API Token with DNS:Edit permissions on var.root_domain in the environment as CLOUDFLARE_API_TOKEN
 }
 
 provider "random" {
@@ -52,7 +60,7 @@ data "aws_ami" "ubuntu-docker" {
 }
 
 data "aws_key_pair" "personal-ssh-key" {
-  key_name = "elliott-framework"
+  key_name = "${var.ssh_key_name}"
 }
 
 data "aws_security_group" "ssh-access" {
@@ -202,7 +210,7 @@ resource "aws_instance" "nextcloud" {
     POSTGRES_DB=nextcloud
     NEXTCLOUD_ADMIN_USER=admin
     NEXTCLOUD_ADMIN_PASSWORD=${random_password.nextcloud_admin_password.result}
-    NEXTCLOUD_TRUSTED_DOMAINS=localhost nextcloud.elliottpope.com www.nextcloud.elliottpope.com
+    NEXTCLOUD_TRUSTED_DOMAINS=localhost nextcloud.${var.root_domain} www.nextcloud.${var.root_domain}
     REDIS_HOST=redis
     REDIS_HOST_PASSWORD=${random_password.redis_password.result}
     EOT
@@ -231,7 +239,8 @@ resource "aws_instance" "nextcloud" {
   # Then set any required environment variables system wide
   provisioner "remote-exec" {
     inline = [  
-      "echo NEXTCLOUD_DATA_DIR=\"${var.nextcloud_data_root_dir}\" | sudo tee -a /etc/environment > /dev/null"
+      "echo NEXTCLOUD_DATA_DIR=\"${var.nextcloud_data_root_dir}\" | sudo tee -a /etc/environment > /dev/null",
+      "echo DOMAIN=\"${var.root_domain}\" | sudo tee -a /etc/environment > /dev/null"
     ]
   }
 }

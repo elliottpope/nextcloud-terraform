@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(nextcloud.elliottpope.com www.nextcloud.elliottpope.com)
+domains=(nextcloud.${DOMAIN} www.nextcloud.${DOMAIN})
 rsa_key_size=4096
 compose_file_location=./init-certificates.yml
 data_path=$1
